@@ -18,12 +18,16 @@ const AuthForm = () => {
      const enterdEmail = emailInputRef.current.value
      const enterdPassword = passwordInputRef.current.value
 
-     setIsLoading(true)
-     if(isLogin){
+     setIsLoading(true);
 
+     let url;
+     if(isLogin){
+       url = 'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyBGXdchh1o8k8uG-_1w2V4zlbbgktEl1bo';
      }else{
-      fetch('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyBGXdchh1o8k8uG-_1w2V4zlbbgktEl1bo',
-      {
+      url = 'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyBGXdchh1o8k8uG-_1w2V4zlbbgktEl1bo';
+     }
+      fetch(url,{
+        
         method:'POST',
         body:JSON.stringify({
           email:enterdEmail,
@@ -33,23 +37,31 @@ const AuthForm = () => {
         headers:{
           'Content-Type':'application/json'
         },
-      }
-      ).then((res)=>{
+      
+      })
+      .then((res)=>{
         setIsLoading(false)
         if(res.ok){
-
+          return res.json()
         }else{
           return res.json().then((data)=>{
             let errorMessage = 'Authentication Failed!';
             // if(data && data.error && data.error.message) {
             //   errorMessage = data.error.message
             // }
-            alert(errorMessage)
+            
+            throw new Error(errorMessage)
            
           }) 
         }
       })
-    }
+      .then((data)=>{
+        console.log(data)
+      })
+      .catch((err)=>{
+       console.error('Error during authentication:', err);
+        alert(err.message)
+      })
   }
   return (
     <section className={classes.auth}>
